@@ -5,7 +5,7 @@ pins = []
 pinled = Pin("LED", Pin.OUT)
 for i in range(28):
     pins.append(Pin(i+1, Pin.OUT))
-valid_inputs_menu = ["1","2","3","4","5","6","7","8","I","i","Q","q","h",1,2,3,4,5,6,7,8]
+valid_inputs_menu = ["1","2","3","4","5","6","7","8","I","i","Q","q","h","9",1,2,3,4,5,6,7,8,9]
 valid_numbers = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"]
 valid_numbers_input = ["1","0",1,0]
 gpio_total_states = []
@@ -13,11 +13,16 @@ gpio_pins_on = []
 gpio_pins_off = []
 action_info = {"1":"You can set a pin GPIO state to HIGH or LOW. Unforanalty, the pins are set to OUT mode, so they cannot reaive signals. This mode is meant to spesicily test the power output of ONE gpio pin.","2":"You can see the state of ONE gpio pin. It will print out 1 or 0. If it prints out 1, then it is on. If it prints out 0, then it it off.","3":"A list of all the GPIO pins that are ON right now.","4":"Lists out all the pins that are OFF right now.", "5":"Tests pins, one by one, and will turn them no for a duaration of 3 sec, and then will turn it off to go to the next pin. This is ment for indiviual pins.  You may connect your pico to a breadbord with LEDS to see if the pins work.","6":"Blinks the LED around 10 times.","7":"Turns all the gpio pins ON. You can check the state of the pins by pressing 3.","8":"Turns all the GPIO OFF. You can check with with #4.","h":"This menu. Tells you more about the commands that this runs","q":"Quits the script. Runs a cleanup function that turn OFF all the pins for a clean shutdown. If this script crashes, run it again and press Q to clean it up."}
 userinput = None
+ssid = None
+ssid_passphrase = "None Set."
+pico_version = "2"
 
 print("Welcome to Pico 2 GPIO Controler! The most advanced controler to ever exist(i think.)")
-print("Made by Gobrowse and OpenBoardDev")
+print("Made by Gobrowse")
 print("")
 def optionboard():
+    if pico_version == "2W" or pico_version == "W":
+        print("Connected to:", SSID)
     print("What do you want to do?")
     print("[1] Set GPIO state")
     print("[2] See GPIO state")
@@ -27,6 +32,9 @@ def optionboard():
     print("[6] See if LED works")
     print("[7] Turn ALL GPIO on")
     print("[8] Turn ALL GPIO off")
+    print("[9] Settings")
+    if pico_version == "W" or pico_version == "2W":
+        print("[10] Check Wifi of Pico (ONLY FOR PICO W)")
     print("[i or h] Get more detailed description of each action")
     print("[q] Quit")
     choise = str(input("Press the # or letter to choose one: "))
@@ -127,6 +135,15 @@ def actions(userinput):
             pinumberalloff = pinumberalloff + 1
         print("All Pins OFF")
         optionboard()
+        if userinput == "9" or userinput == 9:
+            print("Ok, what is your network SSID?")
+            optionboard()
+        if userinput == 10 or userinput == "10":
+            print("Settings")
+            print("[1] Change SSID")
+            print("[2] Change SSID password")
+            print("[3] Change Pico Version")
+            optionboard()
     if userinput == "i":
         print("What action do you want more informaiton about?")
         actioninfo = input()
