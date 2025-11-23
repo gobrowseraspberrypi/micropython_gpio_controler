@@ -1,36 +1,10 @@
 from machine import Pin
 from utime import sleep
 #setting up all the variables and lists
+pins = []
 pinled = Pin("LED", Pin.OUT)
-pin1 = Pin(1, Pin.OUT)
-pin2 = Pin(2, Pin.OUT)
-pin3 = Pin(3, Pin.OUT)
-pin4 = Pin(4, Pin.OUT)
-pin5 = Pin(5, Pin.OUT)
-pin6 = Pin(6, Pin.OUT)
-pin7 = Pin(7, Pin.OUT)
-pin8 = Pin(8, Pin.OUT)
-pin9 = Pin(9, Pin.OUT)
-pin10 = Pin(10, Pin.OUT)
-pin11= Pin(11, Pin.OUT)
-pin12 = Pin(12, Pin.OUT)
-pin13 = Pin(13, Pin.OUT)
-pin14 = Pin(14, Pin.OUT)
-pin15 = Pin(15, Pin.OUT)
-pin16 = Pin(16, Pin.OUT)
-pin17 = Pin(17, Pin.OUT)
-pin18 = Pin(18, Pin.OUT)
-pin19 = Pin(19, Pin.OUT)
-pin20 = Pin(20, Pin.OUT)
-pin21 = Pin(21, Pin.OUT)
-pin22 = Pin(22, Pin.OUT)
-pin23 = Pin(23, Pin.OUT)
-pin24 = Pin(24, Pin.OUT)
-pin25 = Pin(25, Pin.OUT)
-pin26 = Pin(26, Pin.OUT)
-pin27 = Pin(27, Pin.OUT)
-pin28 = Pin(28, Pin.OUT)
-pins = [pin1,pin2,pin3,pin4,pin5,pin6,pin7,pin8,pin9,pin10,pin11,pin12,pin13,pin14,pin15,pin16,pin17,pin18,pin19,pin20,pin21,pin22,pin23,pin24,pin25,pin26,pin27,pin28]
+for i in range(28):
+    pins.append(Pin(i+1, Pin.OUT))
 valid_inputs_menu = ["1","2","3","4","5","6","7","8","I","i","Q","q","h",1,2,3,4,5,6,7,8]
 valid_numbers = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"]
 valid_numbers_input = ["1","0",1,0]
@@ -105,7 +79,6 @@ def actions(userinput):
             gpio_total_states.append(pins[x-1].value())
             if pins[x-1].value() == 1:
                 gpio_pins_on.append(x-1)
-            print(gpio_total_states)
             testvar = testvar + 1
         print(len(gpio_total_states))
         print("Pins # ",gpio_pins_on, "are ON")
@@ -174,7 +147,7 @@ def cleanup():
         pins[pinsloop].off()
         pinsloop = pinsloop + 1
     pinled.value(0)
-    pin1.value(0)
+    pins[0].value(0)
     print("Thanks! Come Again Next time!")
     
 #frist tests
