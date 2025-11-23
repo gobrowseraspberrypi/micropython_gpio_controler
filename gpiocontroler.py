@@ -1,0 +1,186 @@
+from machine import Pin
+from utime import sleep
+#setting up all the variables and lists
+pinled = Pin("LED", Pin.OUT)
+pin1 = Pin(1, Pin.OUT)
+pin2 = Pin(2, Pin.OUT)
+pin3 = Pin(3, Pin.OUT)
+pin4 = Pin(4, Pin.OUT)
+pin5 = Pin(5, Pin.OUT)
+pin6 = Pin(6, Pin.OUT)
+pin7 = Pin(7, Pin.OUT)
+pin8 = Pin(8, Pin.OUT)
+pin9 = Pin(9, Pin.OUT)
+pin10 = Pin(10, Pin.OUT)
+pin11= Pin(11, Pin.OUT)
+pin12 = Pin(12, Pin.OUT)
+pin13 = Pin(13, Pin.OUT)
+pin14 = Pin(14, Pin.OUT)
+pin15 = Pin(15, Pin.OUT)
+pin16 = Pin(16, Pin.OUT)
+pin17 = Pin(17, Pin.OUT)
+pin18 = Pin(18, Pin.OUT)
+pin19 = Pin(19, Pin.OUT)
+pin20 = Pin(20, Pin.OUT)
+pin21 = Pin(21, Pin.OUT)
+pin22 = Pin(22, Pin.OUT)
+pin23 = Pin(23, Pin.OUT)
+pin24 = Pin(24, Pin.OUT)
+pin25 = Pin(25, Pin.OUT)
+pin26 = Pin(26, Pin.OUT)
+pin27 = Pin(27, Pin.OUT)
+pin28 = Pin(28, Pin.OUT)
+pins = [pin1,pin2,pin3,pin4,pin5,pin6,pin7,pin8,pin9,pin10,pin11,pin12,pin13,pin14,pin15,pin16,pin17,pin18,pin19,pin20,pin21,pin22,pin23,pin24,pin25,pin26,pin27,pin28]
+valid_inputs_menu = ["1","2","3","4","5","6","7","8","I","i","Q","q","h",1,2,3,4,5,6,7,8]
+valid_numbers = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"]
+valid_numbers_input = ["1","0",1,0]
+gpio_total_states = []
+gpio_pins_on = []
+gpio_pins_off = []
+action_info = {"1":"You can set a pin GPIO state to HIGH or LOW. Unforanalty, the pins are set to OUT mode, so they cannot reaive signals. This mode is meant to spesicily test the power output of ONE gpio pin.","2":"You can see the state of ONE gpio pin. It will print out 1 or 0. If it prints out 1, then it is on. If it prints out 0, then it it off.","3":"A list of all the GPIO pins that are ON right now.","4":"Lists out all the pins that are OFF right now.", "5":"Tests pins, one by one, and will turn them no for a duaration of 3 sec, and then will turn it off to go to the next pin. This is ment for indiviual pins.  You may connect your pico to a breadbord with LEDS to see if the pins work.","6":"Blinks the LED around 10 times.","7":"Turns all the gpio pins ON. You can check the state of the pins by pressing 3.","8":"Turns all the GPIO OFF. You can check with with #4.","h":"This menu. Tells you more about the commands that this runs","q":"Quits the script. Runs a cleanup function that turn OFF all the pins for a clean shutdown. If this script crashes, run it again and press Q to clean it up."}
+userinput = None
+
+print("Welcome to Pico 2 GPIO Controler! The most advanced controler to ever exist(i think.)")
+print("Made by Gobrowse and OpenBoardDev")
+print("")
+def optionboard():
+    print("What do you want to do?")
+    print("[1] Set GPIO state")
+    print("[2] See GPIO state")
+    print("[3] See all GPIO pins that are ON")
+    print("[4] See all GPIO pins that are OFF")
+    print("[5] Test all GPIO pins (Get a Voltimeter!)")
+    print("[6] See if LED works")
+    print("[7] Turn ALL GPIO on")
+    print("[8] Turn ALL GPIO off")
+    print("[i or h] Get more detailed description of each action")
+    print("[q] Quit")
+    choise = str(input("Press the # or letter to choose one: "))
+    if not (choise in valid_inputs_menu):
+        print("Invaild Option. Choose again.")
+    else:
+        actions(choise)
+
+def actions(userinput):
+    if userinput == 1 or userinput == "1":
+        print("GPIO state is being set. What GPIO pin do you want to set up? (GPIO #, ex: gpio 2 = 2. DO NOT PUT LETTERS) ")
+        pin_setup = input()
+        if not (pin_setup in valid_numbers):
+            print("invald input. quitting.")
+            cleanup()
+        else:
+            pin_setup = int(pin_setup)
+            print("What value you want to set? (1 is high and 0 is low) ")
+            pin_value = input()
+            if not (pin_value in valid_numbers_input):
+                print("invald input. quitting")
+                cleanup()
+            else:
+                pin_value = int(pin_value)
+                if (pin_setup <= len(pins)) and (pin_setup > 0):
+                    pins[pin_setup - 1].value(pin_value)
+                    print("Set Pin ", pin_setup, "to value ", pin_value)
+                    optionboard()
+                else:
+                    print("Something went wrong. Running CleanUp")
+                    cleanup()
+    elif userinput == 2 or userinput == "2":
+        print("What GPIO port do you want to see?")
+        gpio_state_number = input()
+        if not (gpio_state_number in valid_numbers):
+            print("invalid input. quitting...")
+            cleanup()
+        else:
+            gpio_state_number = int(gpio_state_number)
+            if (gpio_state_number <= len(pins) and gpio_state_number > 0):
+                gpio_state = pins[gpio_state_number - 1].value()
+                print("Pin # ", gpio_state_number, "value is ", gpio_state)
+                optionboard()
+    if userinput == 3 or userinput == "3":
+        gpio_total_states.clear()
+        gpio_pins_on.clear()
+        testvar = 0
+        forlooprange = len(pins)
+        for x in range(1, len(pins)):
+            gpio_total_states.append(pins[x-1].value())
+            if pins[x-1].value() == 1:
+                gpio_pins_on.append(x-1)
+            print(gpio_total_states)
+            testvar = testvar + 1
+        print(len(gpio_total_states))
+        print("Pins # ",gpio_pins_on, "are ON")
+        optionboard()
+    if userinput == 4 or userinput == "4":
+        gpio_total_states.clear()
+        gpio_pins_off.clear()
+        testvar = 0
+        forlooprange = len(pins)
+        for x in range(1, len(pins)):
+            gpio_total_states.append(pins[x-1].value())
+            if pins[x-1].value() == 0:
+                gpio_pins_off.append(x-1)
+            print(gpio_total_states)
+            testvar = testvar + 1
+        print(len(gpio_total_states))
+        print("Pins # ",gpio_pins_off, "are OFF")
+        optionboard()
+    if userinput == 5 or userinput == "5":
+        print('Blinking all GPIO pins one by one for 3 sec each', )
+        pinnumbertest = 0
+        for x in range(1, len(pins)):
+            print("blinking pin #", pinnumbertest+1)
+            pins[pinnumbertest].toggle()
+            sleep(3)
+            pins[pinnumbertest].toggle()
+            pinnumbertest = pinnumbertest + 1
+        optionboard()
+    if userinput == 6 or userinput == "6":
+        print("Blinking onboard LED 10 times....")
+        for x in range(0,10):
+            pinled.toggle()
+            sleep(1)
+        optionboard()
+    if userinput == 7 or userinput == "7":
+        pinumberallon = 0
+        for x in range(1, len(pins)):
+            pins[pinumberallon].value(1)
+            pinumberallon = pinumberallon + 1
+        print("All Pins ON")
+        optionboard()
+    if userinput == 8 or userinput == "8":
+        pinumberalloff = 0
+        for x in range(1, len(pins)):
+            pins[pinumberalloff].value(0)
+            pinumberalloff = pinumberalloff + 1
+        print("All Pins OFF")
+        optionboard()
+    if userinput == "i":
+        print("What action do you want more informaiton about?")
+        actioninfo = input()
+        if actioninfo == "h" or actioninfo == "i":
+            print(action_info["h"])
+            optionboard()
+        else:
+            print(action_info[actioninfo])
+            optionboard()
+
+    if userinput == "q":
+        cleanup()
+
+def cleanup():
+    pinsloop = 1
+    for x in range(len(pins) - 1):
+        pins[pinsloop].value(0)
+        pins[pinsloop].off()
+        pinsloop = pinsloop + 1
+    pinled.value(0)
+    pin1.value(0)
+    print("Thanks! Come Again Next time!")
+    
+#frist tests
+#pin0 = Pin(1, Pin.OUT)
+#pin0.value(1)
+#in_state = pin0.value()
+#print(in_state)
+#pin0.off()
+optionboard()
