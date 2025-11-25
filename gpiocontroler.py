@@ -11,40 +11,46 @@ pins = []
 pinled = Pin("LED", Pin.OUT)
 for i in range(28):
     pins.append(Pin(i+1, Pin.OUT))
-valid_inputs_menu = ["1","2","3","4","5","6","7","8","I","i","Q","q","h","9","10","11",1,2,3,4,5,6,7,8,9,1,11]
+valid_inputs_menu = ["1","2","3","4","5","6","7","8","I","i","Q","q","h","9","10","11","c",1,2,3,4,5,6,7,8,9,1,11]
 valid_numbers = ["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26","27","28"]
 valid_numbers_input = ["1","0",1,0]
 gpio_total_states = []
 gpio_pins_on = []
 gpio_pins_off = []
-action_info = {"1":"You can set a pin GPIO state to HIGH or LOW. Unforanalty, the pins are set to OUT mode, so they cannot reaive signals. This mode is meant to spesicily test the power output of ONE gpio pin.","2":"You can see the state of ONE gpio pin. It will print out 1 or 0. If it prints out 1, then it is on. If it prints out 0, then it it off.","3":"A list of all the GPIO pins that are ON right now.","4":"Lists out all the pins that are OFF right now.", "5":"Tests pins, one by one, and will turn them no for a duaration of 3 sec, and then will turn it off to go to the next pin. This is ment for indiviual pins.  You may connect your pico to a breadbord with LEDS to see if the pins work.","6":"Blinks the LED around 10 times.","7":"Turns all the gpio pins ON. You can check the state of the pins by pressing 3.","8":"Turns all the GPIO OFF. You can check with with #4.","h":"This menu. Tells you more about the commands that this runs","q":"Quits the script. Runs a cleanup function that turn OFF all the pins for a clean shutdown. If this script crashes, run it again and press Q to clean it up."}
+action_info = {"1":"You can set a pin GPIO state to HIGH or LOW. unfortunately, the pins are set to OUT mode, so they cannot resive signals. This mode is meant to specially test the power output of ONE gpio pin.","2":"You can see the state of ONE gpio pin. It will print out 1 or 0. If it prints out 1, then it is on. If it prints out 0, then it it off.","3":"A list of all the GPIO pins that are ON right now.","4":"Lists out all the pins that are OFF right now.", "5":"Tests pins, one by one, and will turn them no for a duration of 3 sec, and then will turn it off to go to the next pin. This is meant for individual pins.  You may connect your pico to a breadboard with LEDS to see if the pins work.","6":"Blinks the LED around 10 times.","7":"Turns all the gpio pins ON. You can check the state of the pins by pressing 3.","8":"Turns all the GPIO OFF. You can check with with #4.","h":"This menu. Tells you more about the commands that this runs","q":"Quits the script. Runs a cleanup function that turn OFF all the pins for a clean shutdown. If this script crashes, run it again and press Q to clean it up.", "9":"Settings:Lets you change your pico version for more options, depending on what model you have", "10":"Lets you, on pico w, set up a network connection. Type in your ssid and password, and you can test it out with function [11].","11":"Checks the pico wifi by pinging a website you choose. Not ips, but you will be able to ping ips soon.","12":"Tells you the IP of the pico, but you can see this on the top of the menu anyway."}
 userinput = None
 ssid_func = None
 global pico_version
-pico_version = "2W"
+global ip
+ip = None
+pico_version = "1"
 network_timeout = 10
 network_time = 0
-#checking Pico Verson, IDK how to get this automatcly.
-if pico_version == "2W" or pico_version == "W":
-    wlan = network.WLAN(network.STA_IF)
-    wlan.active(True)
-    if wlan.isconnected() ==  True:
-        ip = wlan.ifconfig()[0]
-    else:
-        ip = "0.0.0.0"
-print("Welcome to Pico 2 GPIO Controler! The most advanced controler to ever exist(i think.)")
+#checking Pico Version, IDK how to get this automatic.
+
+print("Welcome to Pico GPIO Controller! The most advanced controller to ever exist(i think.)")
 print("Made by Gobrowse")
 print("")
 def optionboard():
+    if pico_version == "2W" or pico_version == "W":
+        global ip
+        global wlan
+        wlan = network.WLAN(network.STA_IF)
+        wlan.active(True)
+        if wlan.isconnected() ==  True:
+            ip = wlan.ifconfig()[0]
+        else:
+            ip = "0.0.0.0"
     print("Pico Version:", pico_version)
     if pico_version == "2W" or pico_version == "W":
+        global ip
         print("IP is,", ip)
     print("What do you want to do?")
     print("[1] Set GPIO state")
     print("[2] See GPIO state")
     print("[3] See all GPIO pins that are ON")
     print("[4] See all GPIO pins that are OFF")
-    print("[5] Test all GPIO pins (Get a Voltimeter!)")
+    print("[5] Test all GPIO pins (Get a Voltmeter!)")
     print("[6] See if LED works")
     print("[7] Turn ALL GPIO on")
     print("[8] Turn ALL GPIO off")
@@ -53,23 +59,29 @@ def optionboard():
         print("[10] Connect to Wifi")
         print("[11] Check Wifi of Pico")
         print("[12] Check Pico IP")
+    print("[c] Run CleanUp script")
     print("[i or h] Get more detailed description of each action")
     print("[q] Quit")
-    choise = str(input("Press the # or letter to choose one: "))
-    if not (choise in valid_inputs_menu):
-        print("Invaild Option. Choose again.")
+    choice = str(input("Press the # or letter to choose one: "))
+    if not (choice in valid_inputs_menu):
+        print("invalid Option. Choose again.")
     else:
-        actions(choise)
+        actions(choice)
 
 def connect(ssid,password):
     #Connect to WLAN
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
-    
+    timeout = 20
+    timenow = 0
     wlan.connect(ssid, password)
     while wlan.isconnected() == False:
+        timenow = timenow + 1
         print('Waiting for connection...')
         sleep(1)
+    if timenow == timeout and wlan.isconnected() == False:
+        print("Timeout:", timeout)
+        optionboard()
     ip = wlan.ifconfig()[0]
     print(f'Connected on {ip}')
     optionboard()
@@ -95,15 +107,15 @@ def actions(userinput):
         print("GPIO state is being set. What GPIO pin do you want to set up? (GPIO #, ex: gpio 2 = 2. DO NOT PUT LETTERS) ")
         pin_setup = input()
         if not (pin_setup in valid_numbers):
-            print("invald input. quitting.")
-            cleanup()
+            print("invalid input. ")
+            optionboard()
         else:
             pin_setup = int(pin_setup)
             print("What value you want to set? (1 is high and 0 is low) ")
             pin_value = input()
             if not (pin_value in valid_numbers_input):
-                print("invald input. quitting")
-                cleanup()
+                print("invalid input. quitting")
+                optionboard()
             else:
                 pin_value = int(pin_value)
                 if (pin_setup <= len(pins)) and (pin_setup > 0):
@@ -111,14 +123,14 @@ def actions(userinput):
                     print("Set Pin ", pin_setup, "to value ", pin_value)
                     optionboard()
                 else:
-                    print("Something went wrong. Running CleanUp")
-                    cleanup()
+                    print("Something went wrong.")
+                    optionboard()
     elif userinput == 2 or userinput == "2":
         print("What GPIO port do you want to see?")
         gpio_state_number = input()
         if not (gpio_state_number in valid_numbers):
-            print("invalid input. quitting...")
-            cleanup()
+            print("invalid input.")
+            optionboard()
         else:
             gpio_state_number = int(gpio_state_number)
             if (gpio_state_number <= len(pins) and gpio_state_number > 0):
@@ -176,6 +188,7 @@ def actions(userinput):
         print("All Pins ON")
         optionboard()
     if userinput == 8 or userinput == "8":
+        global pinumberalloff
         pinumberallofff = 0
         for x in range(1, len(pins)):
             pins[pinumberalloff].value(0)
@@ -183,7 +196,7 @@ def actions(userinput):
         print("All Pins OFF")
         optionboard()
     if userinput == "10" or userinput == 10:
-        if wlan.isconnected() == False:
+        if wlan.isconnected() == False or ip == None or ip == "0.0.0.0":
             print("Ok, what is your network SSID?")
             ssid_func = input()
             print('Ok, what is your SSID password?')
@@ -224,13 +237,16 @@ def actions(userinput):
             print("[4] Pico 2 W")
             pico_version_choice = input()
             if pico_version_choice == '1':
-                pico_version == '1'
+                pico_version = '1'
             elif pico_version_choice == "2":
-                pico_version == "W"
+                pico_version = "W"
             elif pico_version_choice == "3":
                 pico_version = '2'
-            elif pico_version == "4":
+            elif pico_version_choice == "4":
                 pico_version = "2W"
+            else:
+                print("invalid version.")
+                optionboard()
         optionboard()
         if userinput == 11 or userinput == "11":
             ifconfig = wlan.ifconfig()
@@ -245,11 +261,11 @@ def actions(userinput):
         else:
             print(action_info[actioninfo])
             optionboard()
-
+    if userinput == "c":
+        cleanup(True)
     if userinput == "q":
-        cleanup()
-
-def cleanup():
+        cleanup(False)
+def cleanup(returntomenu):
     pinsloop = 1
     for x in range(len(pins) - 1):
         pins[pinsloop].value(0)
@@ -257,7 +273,10 @@ def cleanup():
         pinsloop = pinsloop + 1
     pinled.value(0)
     pins[0].value(0)
-    print("Thanks! Come Again Next time!")
+    if returntomenu == False:
+        print("Thanks! Come Again Next time!")
+    elif returntomenu == True:
+        optionboard()
     
 #frist tests
 #pin0 = Pin(1, Pin.OUT)
@@ -265,4 +284,5 @@ def cleanup():
 #in_state = pin0.value()
 #print(in_state)
 #pin0.off()
+
 optionboard()

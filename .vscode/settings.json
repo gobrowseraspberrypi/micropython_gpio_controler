@@ -1,5 +1,5 @@
 {
-    "python.languageServer": "Pylance",
+    "python.languageServer": "Jedi",
     "python.analysis.typeCheckingMode": "basic",
     "python.analysis.diagnosticSeverityOverrides": {
         "reportMissingModuleSource": "none"
@@ -11,5 +11,12 @@
     ],
     "python.analysis.extraPaths": [
         "~/.micropico-stubs/included"
+    ],
+    "cSpell.words": [
+        "BOOTSEL",
+        "micropython",
+        "mircopython",
+        "Pico",
+        "pinled"
     ]
 }
