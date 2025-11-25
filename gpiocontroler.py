@@ -20,10 +20,11 @@ gpio_pins_off = []
 action_info = {"1":"You can set a pin GPIO state to HIGH or LOW. Unforanalty, the pins are set to OUT mode, so they cannot reaive signals. This mode is meant to spesicily test the power output of ONE gpio pin.","2":"You can see the state of ONE gpio pin. It will print out 1 or 0. If it prints out 1, then it is on. If it prints out 0, then it it off.","3":"A list of all the GPIO pins that are ON right now.","4":"Lists out all the pins that are OFF right now.", "5":"Tests pins, one by one, and will turn them no for a duaration of 3 sec, and then will turn it off to go to the next pin. This is ment for indiviual pins.  You may connect your pico to a breadbord with LEDS to see if the pins work.","6":"Blinks the LED around 10 times.","7":"Turns all the gpio pins ON. You can check the state of the pins by pressing 3.","8":"Turns all the GPIO OFF. You can check with with #4.","h":"This menu. Tells you more about the commands that this runs","q":"Quits the script. Runs a cleanup function that turn OFF all the pins for a clean shutdown. If this script crashes, run it again and press Q to clean it up."}
 userinput = None
 ssid_func = None
+global pico_version
 pico_version = "2W"
 network_timeout = 10
 network_time = 0
-
+#checking Pico Verson, IDK how to get this automatcly.
 if pico_version == "2W" or pico_version == "W":
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
@@ -35,8 +36,9 @@ print("Welcome to Pico 2 GPIO Controler! The most advanced controler to ever exi
 print("Made by Gobrowse")
 print("")
 def optionboard():
+    print("Pico Version:", pico_version)
     if pico_version == "2W" or pico_version == "W":
-        print("Connected to:", ssid_func,". IP is,", ip)
+        print("IP is,", ip)
     print("What do you want to do?")
     print("[1] Set GPIO state")
     print("[2] See GPIO state")
@@ -48,8 +50,9 @@ def optionboard():
     print("[8] Turn ALL GPIO off")
     print("[9] Settings")
     if pico_version == "W" or pico_version == "2W":
-        print("[10] Check Wifi of Pico (ONLY FOR PICO W)")
-        print("[11] Pico Wifi ifonfig")
+        print("[10] Connect to Wifi")
+        print("[11] Check Wifi of Pico")
+        print("[12] Check Pico IP")
     print("[i or h] Get more detailed description of each action")
     print("[q] Quit")
     choise = str(input("Press the # or letter to choose one: "))
@@ -60,9 +63,9 @@ def optionboard():
 
 def connect(ssid,password):
     #Connect to WLAN
-    ssid = ssid_func
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
+    
     wlan.connect(ssid, password)
     while wlan.isconnected() == False:
         print('Waiting for connection...')
@@ -187,6 +190,19 @@ def actions(userinput):
             ssid_passphrase = input()
             connect(ssid_func,ssid_passphrase)
         elif wlan.isconnected() == True:
+            print("Connected to wifi. IP:", ip)
+            optionboard()
+        else:
+            print("Error. Something went wrong.")
+            optionboard()
+    if userinput == "11" or userinput == 11:
+        if wlan.isconnected() == False:
+            print("Ok, what is your network SSID?")
+            ssid_func = input()
+            print('Ok, what is your SSID password?')
+            ssid_passphrase = input()
+            connect(ssid_func,ssid_passphrase)
+        elif wlan.isconnected() == True:
             print("What is your target host? (ex. google.com). Please No numbers, or IPs. deafilts to port 80")
             target_host = input()
             ping(target_host,80)
@@ -194,12 +210,28 @@ def actions(userinput):
             print("Error. Something went wrong.")
             optionboard()
         optionboard()
-        if userinput == 9 or userinput == "9":
-            print("Settings")
-            print("[1] Change SSID")
-            print("[2] Change SSID password")
-            print("[3] Change Pico Version")
-            optionboard()
+    if userinput == 9 or userinput == "9":
+        global pico_version
+        print("Settings")
+        print("[1] Change Pico Version")
+        choice_setting = input()
+        if choice_setting == "1":
+            print("What version of PICO do you own?")
+            print("OPTIONS")
+            print("[1] Pico 1")
+            print("[2] Pico W")
+            print("[3] Pico 2")
+            print("[4] Pico 2 W")
+            pico_version_choice = input()
+            if pico_version_choice == '1':
+                pico_version == '1'
+            elif pico_version_choice == "2":
+                pico_version == "W"
+            elif pico_version_choice == "3":
+                pico_version = '2'
+            elif pico_version == "4":
+                pico_version = "2W"
+        optionboard()
         if userinput == 11 or userinput == "11":
             ifconfig = wlan.ifconfig()
             print(ifconfig)

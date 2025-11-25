@@ -5,8 +5,8 @@ from time import sleep
 import machine
 import rp2
 import sys
-ssid = 'whyyoulookingatmyssid?'
-password = 'pleasedontstealmypassword'
+ssid = ''
+password = ''
 target_host = 'google.com'
 port =80
 def connect():
@@ -19,6 +19,7 @@ def connect():
         sleep(1)
     ip = wlan.ifconfig()[0]
     print(f'Connected on {ip}')
+    print(wlan.ifconfig())
 connect()
 '''
 try:
