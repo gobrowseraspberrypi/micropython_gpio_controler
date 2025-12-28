@@ -1,12 +1,18 @@
 from machine import Pin
 from utime import sleep
-import network
-import socket
 from time import sleep
 import machine
 import rp2
 import sys
 #setting up all the variables and lists
+global pico_version
+try:
+    import network
+    import socket
+    pico_version = "w"
+except ImportError:
+    print("Pico W or 2W not detected")
+    pico_version = "1"
 pins = []
 pinled = Pin("LED", Pin.OUT)
 for i in range(28):
@@ -20,10 +26,8 @@ gpio_pins_off = []
 action_info = {"1":"You can set a pin GPIO state to HIGH or LOW. unfortunately, the pins are set to OUT mode, so they cannot resive signals. This mode is meant to specially test the power output of ONE gpio pin.","2":"You can see the state of ONE gpio pin. It will print out 1 or 0. If it prints out 1, then it is on. If it prints out 0, then it it off.","3":"A list of all the GPIO pins that are ON right now.","4":"Lists out all the pins that are OFF right now.", "5":"Tests pins, one by one, and will turn them no for a duration of 3 sec, and then will turn it off to go to the next pin. This is meant for individual pins.  You may connect your pico to a breadboard with LEDS to see if the pins work.","6":"Blinks the LED around 10 times.","7":"Turns all the gpio pins ON. You can check the state of the pins by pressing 3.","8":"Turns all the GPIO OFF. You can check with with #4.","h":"This menu. Tells you more about the commands that this runs","q":"Quits the script. Runs a cleanup function that turn OFF all the pins for a clean shutdown. If this script crashes, run it again and press Q to clean it up.", "9":"Settings:Lets you change your pico version for more options, depending on what model you have", "10":"Lets you, on pico w, set up a network connection. Type in your ssid and password, and you can test it out with function [11].","11":"Checks the pico wifi by pinging a website you choose. Not ips, but you will be able to ping ips soon.","12":"Tells you the IP of the pico, but you can see this on the top of the menu anyway."}
 userinput = None
 ssid_func = None
-global pico_version
 global ip
 ip = None
-pico_version = "1"
 network_timeout = 10
 network_time = 0
 #checking Pico Version, IDK how to get this automatic.
